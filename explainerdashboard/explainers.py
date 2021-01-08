@@ -1623,10 +1623,10 @@ class ClassifierExplainer(BaseExplainer):
             if self.shap == 'tree':
                 if (str(type(self.model)).endswith("XGBClassifier'>") or
                     str(type(self.model)).endswith("LGBMClassifier'>") or
-                    str(type(self.model)).endswith("CatBoostClassifier'>") or
                     str(type(self.model)).endswith("GradientBoostingClassifier'>") or
-                    str(type(self.model)).endswith("HistGradientBoostingClassifier'>")
-                    ):
+                    str(type(self.model)).endswith("CatBoostClassifier'>") or
+                        str(type(self.model)).endswith("HistGradientBoostingClassifier'>")
+                ):
                     
                     if self.model_output == "probability": 
                         if self.X_background is None:
@@ -1647,6 +1647,9 @@ class ClassifierExplainer(BaseExplainer):
                                                     model_output="probability",
                                                     feature_perturbation="interventional")
                         self.interactions_should_work = False
+                    elif self.model_output == 'raw':
+                        # this is the case for catboost
+                        self._shap_explainer = shap.TreeExplainer(self.model, model_output="raw", feature_perturbation="tree_path_dependent")
                     else:
                         self.model_output = "logodds"
                         print(f"Generating self.shap_explainer = shap.TreeExplainer(model{', X_background' if self.X_background is not None else ''})")
